@@ -65,7 +65,7 @@ class ContactsListFragment : Fragment(R.layout.contacts_list_fragment) {
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
         progressBar.visibility = View.VISIBLE
-        service.getUsers()
+        service.callUsers()
             .enqueue(object : Callback<List<UserResponse>> {
                 override fun onFailure(call: Call<List<UserResponse>>, t: Throwable) {
                     val message = getString(R.string.error)
