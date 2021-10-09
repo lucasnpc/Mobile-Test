@@ -2,28 +2,31 @@ package com.picpay.desafio.android
 
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
+import com.picpay.desafio.android.data.remote.dto.UserResponse
+import com.picpay.desafio.android.databinding.ListItemUserBinding
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
-import kotlinx.android.synthetic.main.list_item_user.view.*
 
 class UserListItemViewHolder(
-    itemView: View
-) : RecyclerView.ViewHolder(itemView) {
+   itemView: ListItemUserBinding
+) : RecyclerView.ViewHolder(itemView.root) {
 
-    fun bind(user: User) {
-        itemView.name.text = user.name
-        itemView.username.text = user.username
-        itemView.progressBar.visibility = View.VISIBLE
+    val view = itemView
+
+    fun bind(userResponse: UserResponse) {
+        view.name.text = userResponse.name
+        view.username.text = userResponse.username
+        view.progressBar.visibility = View.VISIBLE
         Picasso.get()
-            .load(user.img)
+            .load(userResponse.img)
             .error(R.drawable.ic_round_account_circle)
-            .into(itemView.picture, object : Callback {
+            .into(view.picture, object : Callback {
                 override fun onSuccess() {
-                    itemView.progressBar.visibility = View.GONE
+                    view.progressBar.visibility = View.GONE
                 }
 
                 override fun onError(e: Exception?) {
-                    itemView.progressBar.visibility = View.GONE
+                    view.progressBar.visibility = View.GONE
                 }
             })
     }
