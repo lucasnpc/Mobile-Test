@@ -1,6 +1,7 @@
 package com.picpay.desafio.android.ui.contactsListFragment
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -26,16 +27,18 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
 import com.picpay.desafio.android.R
-import com.picpay.desafio.android.data.remote.PicPayService
 import com.picpay.desafio.android.data.remote.dto.UserResponse
+import dagger.hilt.android.AndroidEntryPoint
 
 @ExperimentalCoilApi
+@AndroidEntryPoint
 class ContactsListFragment : Fragment(R.layout.contacts_list_fragment) {
 
-    private val service = PicPayService.create()
+    private val viewModel: ContactsListViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -45,7 +48,7 @@ class ContactsListFragment : Fragment(R.layout.contacts_list_fragment) {
         setContent {
             val users = produceState(initialValue = ArrayList<UserResponse>(), producer =
             {
-                value = service.getUsers()
+                value = viewModel.getUsers()
             })
             ContactsList(users = users.value)
         }
@@ -63,53 +66,63 @@ class ContactsListFragment : Fragment(R.layout.contacts_list_fragment) {
                         .padding(top = 8.dp)
                 ) {
                     item {
-                        Text(
-                            text = stringResource(R.string.title),
-                            fontSize = 28.sp,
-                            color = Color.White,
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(start = 24.dp, top = 48.dp)
-                        )
+                        ContactsTitle()
                     }
                     items(users) {
-                        Column(modifier = Modifier.fillMaxWidth(), content = {
-                            Row(content = {
-                                Image(
-                                    painter = rememberImagePainter(it.img),
-                                    contentDescription = "User image",
-                                    modifier = Modifier
-                                        .size(100.dp)
-                                        .padding(start = 24.dp, top = 12.dp, bottom = 12.dp)
-                                        .clip(
-                                            CircleShape
-                                        ),
-                                )
-                                Column {
-                                    Text(
-                                        text = it.username,
-                                        color = Color.White,
-                                        modifier = Modifier.padding(start = 16.dp, top = 24.dp),
-                                        fontSize = 16.sp
-                                    )
-                                    Text(
-                                        text = it.name,
-                                        color = colorResource(R.color.colorDetail),
-                                        modifier = Modifier.padding(
-                                            start = 16.dp,
-                                            bottom = 8.dp
-                                        ),
-                                        fontSize = 14.sp
-                                    )
-                                }
-                            })
-                            Divider()
-                        })
+                        ContactsItems(it)
                     }
                 }
 
             }
+        )
+    }
+
+    @Composable
+    private fun ContactsItems(it: UserResponse) {
+        Column(modifier = Modifier.fillMaxWidth(), content = {
+            Row(content = {
+                Image(
+                    painter = rememberImagePainter(it.img),
+                    contentDescription = "User image",
+                    modifier = Modifier
+                        .size(100.dp)
+                        .padding(start = 24.dp, top = 12.dp, bottom = 12.dp)
+                        .clip(
+                            CircleShape
+                        ),
+                )
+                Column {
+                    Text(
+                        text = it.username,
+                        color = Color.White,
+                        modifier = Modifier.padding(start = 16.dp, top = 24.dp),
+                        fontSize = 16.sp
+                    )
+                    Text(
+                        text = it.name,
+                        color = colorResource(R.color.colorDetail),
+                        modifier = Modifier.padding(
+                            start = 16.dp,
+                            bottom = 8.dp
+                        ),
+                        fontSize = 14.sp
+                    )
+                }
+            })
+            Divider()
+        })
+    }
+
+    @Composable
+    private fun ContactsTitle() {
+        Text(
+            text = stringResource(R.string.title),
+            fontSize = 28.sp,
+            color = Color.White,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 24.dp, top = 48.dp)
         )
     }
 }
