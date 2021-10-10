@@ -1,7 +1,9 @@
 package com.picpay.desafio.android
 
+import androidx.lifecycle.MutableLiveData
 import com.picpay.desafio.android.data.PicPayRepository
 import com.picpay.desafio.android.data.remote.PicPayServiceImpl
+import com.picpay.desafio.android.ui.contactsListFragment.ContactsListState
 import io.ktor.client.*
 import io.ktor.client.engine.android.*
 import io.ktor.client.features.json.*
@@ -9,7 +11,6 @@ import io.ktor.client.features.json.serializer.*
 import io.ktor.client.features.logging.*
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
-import javax.inject.Inject
 
 class PicPayServiceTest {
 
@@ -33,6 +34,7 @@ class PicPayServiceTest {
             users.forEach {
                 println(it)
             }
+            println(users)
             assert(users.isNotEmpty())
         }
     }

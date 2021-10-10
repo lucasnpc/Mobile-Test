@@ -1,7 +1,6 @@
 package com.picpay.desafio.android.ui.contactsListFragment
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,14 +9,15 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Divider
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.produceState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.colorResource
@@ -30,13 +30,14 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
+import coil.transform.CircleCropTransformation
 import com.picpay.desafio.android.R
 import com.picpay.desafio.android.data.remote.dto.UserResponse
 import dagger.hilt.android.AndroidEntryPoint
 
 @ExperimentalCoilApi
 @AndroidEntryPoint
-class ContactsListFragment : Fragment(R.layout.contacts_list_fragment) {
+class ContactsListFragment : Fragment() {
 
     private val viewModel: ContactsListViewModel by viewModels()
 
@@ -57,60 +58,54 @@ class ContactsListFragment : Fragment(R.layout.contacts_list_fragment) {
     @Preview
     @Composable
     fun ContactsList(users: ArrayList<UserResponse> = ArrayList()) {
+        val uiState = viewModel.state.observeAsState().value
         Scaffold(
             content = {
-                LazyColumn(
-                    modifier = Modifier
-                        .background(colorResource(id = R.color.colorPrimaryDark))
-                        .fillMaxSize()
-                        .padding(top = 8.dp)
-                ) {
-                    item {
-                        ContactsTitle()
-                    }
-                    items(users) {
-                        ContactsItems(it)
-                    }
-                }
-
+                Box(modifier = Modifier
+                    .background(colorResource(id = R.color.colorPrimaryDark))
+                    .fillMaxSize(),
+                    contentAlignment = Alignment.Center,
+                    content = {
+                        uiState?.let {
+                            if (it.success)
+                                CreateContactsList(users)
+                            if (it.isLoading)
+                                CreateLoadingProgressBar()
+                            if (it.failed)
+                                CreateErrorScreen()
+                        }
+                    })
             }
         )
     }
 
     @Composable
-    private fun ContactsItems(it: UserResponse) {
-        Column(modifier = Modifier.fillMaxWidth(), content = {
-            Row(content = {
-                Image(
-                    painter = rememberImagePainter(it.img),
-                    contentDescription = "User image",
-                    modifier = Modifier
-                        .size(100.dp)
-                        .padding(start = 24.dp, top = 12.dp, bottom = 12.dp)
-                        .clip(
-                            CircleShape
-                        ),
-                )
-                Column {
-                    Text(
-                        text = it.username,
-                        color = Color.White,
-                        modifier = Modifier.padding(start = 16.dp, top = 24.dp),
-                        fontSize = 16.sp
-                    )
-                    Text(
-                        text = it.name,
-                        color = colorResource(R.color.colorDetail),
-                        modifier = Modifier.padding(
-                            start = 16.dp,
-                            bottom = 8.dp
-                        ),
-                        fontSize = 14.sp
-                    )
-                }
-            })
-            Divider()
-        })
+    private fun CreateContactsList(users: ArrayList<UserResponse>) {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
+            item {
+                ContactsTitle()
+            }
+            items(users) {
+                ContactsItems(it)
+            }
+        }
+    }
+
+    @Composable
+    private fun CreateLoadingProgressBar() {
+        CircularProgressIndicator(color = colorResource(id = R.color.colorAccent))
+    }
+
+    @Composable
+    private fun CreateErrorScreen() {
+        Text(
+            text = "Alguma coisa deu Errado",
+            color = Color.White,
+            fontSize = 24.sp
+        )
     }
 
     @Composable
@@ -124,5 +119,42 @@ class ContactsListFragment : Fragment(R.layout.contacts_list_fragment) {
                 .fillMaxWidth()
                 .padding(start = 24.dp, top = 48.dp)
         )
+    }
+
+    @Composable
+    private fun ContactsItems(it: UserResponse) {
+        Column(modifier = Modifier.fillMaxWidth(), content = {
+            Row(content = {
+                Image(
+                    painter = rememberImagePainter(
+                        data = it.img,
+                        builder = {
+                            crossfade(1500)
+                            transformations(CircleCropTransformation())
+                            placeholder(R.drawable.ic_round_account_circle)
+                        }
+                    ),
+                    contentDescription = "User image",
+                    modifier = Modifier
+                        .size(100.dp)
+                        .padding(start = 24.dp, top = 12.dp, bottom = 12.dp)
+                )
+                Column {
+                    Text(
+                        text = it.username,
+                        color = Color.White,
+                        modifier = Modifier.padding(start = 16.dp, top = 24.dp),
+                        fontSize = 16.sp
+                    )
+                    Text(
+                        text = it.name,
+                        color = colorResource(R.color.colorDetail),
+                        modifier = Modifier.padding(start = 16.dp, bottom = 8.dp),
+                        fontSize = 14.sp
+                    )
+                }
+            })
+            Divider()
+        })
     }
 }
