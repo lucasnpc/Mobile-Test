@@ -1,88 +1,115 @@
 package com.picpay.desafio.android.ui.contactsListFragment
 
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
-import android.widget.ProgressBar
-import android.widget.Toast
+import android.view.ViewGroup
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.Divider
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.produceState
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.google.gson.Gson
-import com.google.gson.GsonBuilder
-import com.picpay.desafio.android.data.remote.PicPayService
+import coil.annotation.ExperimentalCoilApi
+import coil.compose.rememberImagePainter
 import com.picpay.desafio.android.R
+import com.picpay.desafio.android.data.remote.PicPayService
 import com.picpay.desafio.android.data.remote.dto.UserResponse
-import com.picpay.desafio.android.UserListAdapter
-import okhttp3.OkHttpClient
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 
+@ExperimentalCoilApi
 class ContactsListFragment : Fragment(R.layout.contacts_list_fragment) {
 
-    lateinit var view2: View
+    private val service = PicPayService.create()
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        view2 = view
-    }
-
-    private lateinit var recyclerView: RecyclerView
-    private lateinit var progressBar: ProgressBar
-    private lateinit var adapter: UserListAdapter
-
-    private val url = "https://609a908e0f5a13001721b74e.mockapi.io/picpay/api/"
-
-    private val gson: Gson by lazy { GsonBuilder().create() }
-
-    private val okHttp: OkHttpClient by lazy {
-        OkHttpClient.Builder()
-            .build()
-    }
-
-    private val retrofit: Retrofit by lazy {
-        Retrofit.Builder()
-            .baseUrl(url)
-            .client(okHttp)
-            .addConverterFactory(GsonConverterFactory.create(gson))
-            .build()
-    }
-
-    private val service: PicPayService by lazy {
-        retrofit.create(PicPayService::class.java)
-    }
-
-    override fun onResume() {
-        super.onResume()
-
-        recyclerView = view2.findViewById(R.id.recyclerView)
-        progressBar = view2.findViewById(R.id.user_list_progress_bar)
-
-        adapter = UserListAdapter()
-        recyclerView.adapter = adapter
-        recyclerView.layoutManager = LinearLayoutManager(requireContext())
-
-        progressBar.visibility = View.VISIBLE
-        service.callUsers()
-            .enqueue(object : Callback<List<UserResponse>> {
-                override fun onFailure(call: Call<List<UserResponse>>, t: Throwable) {
-                    val message = getString(R.string.error)
-
-                    progressBar.visibility = View.GONE
-                    recyclerView.visibility = View.GONE
-
-                    Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT)
-                        .show()
-                }
-
-                override fun onResponse(call: Call<List<UserResponse>>, response: Response<List<UserResponse>>) {
-                    progressBar.visibility = View.GONE
-
-                    adapter.users = response.body()!!
-                }
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View = ComposeView(requireContext()).apply {
+        setContent {
+            val users = produceState(initialValue = ArrayList<UserResponse>(), producer =
+            {
+                value = service.getUsers()
             })
+            ContactsList(users = users.value)
+        }
     }
 
+    @Preview
+    @Composable
+    fun ContactsList(users: ArrayList<UserResponse> = ArrayList()) {
+        Scaffold(
+            content = {
+                LazyColumn(
+                    modifier = Modifier
+                        .background(colorResource(id = R.color.colorPrimaryDark))
+                        .fillMaxSize()
+                        .padding(top = 8.dp)
+                ) {
+                    item {
+                        Text(
+                            text = stringResource(R.string.title),
+                            fontSize = 28.sp,
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(start = 24.dp, top = 48.dp)
+                        )
+                    }
+                    items(users) {
+                        Column(modifier = Modifier.fillMaxWidth(), content = {
+                            Row(content = {
+                                Image(
+                                    painter = rememberImagePainter(it.img),
+                                    contentDescription = "User image",
+                                    modifier = Modifier
+                                        .size(100.dp)
+                                        .padding(start = 24.dp, top = 12.dp, bottom = 12.dp)
+                                        .clip(
+                                            CircleShape
+                                        ),
+                                )
+                                Column {
+                                    Text(
+                                        text = it.username,
+                                        color = Color.White,
+                                        modifier = Modifier.padding(start = 16.dp, top = 24.dp),
+                                        fontSize = 16.sp
+                                    )
+                                    Text(
+                                        text = it.name,
+                                        color = colorResource(R.color.colorDetail),
+                                        modifier = Modifier.padding(
+                                            start = 16.dp,
+                                            bottom = 8.dp
+                                        ),
+                                        fontSize = 14.sp
+                                    )
+                                }
+                            })
+                            Divider()
+                        })
+                    }
+                }
+
+            }
+        )
+    }
 }

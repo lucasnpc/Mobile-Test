@@ -7,11 +7,8 @@ import io.ktor.client.request.*
 import retrofit2.Call
 
 class PicPayServiceImpl(private val client: HttpClient) : PicPayService {
-    override fun callUsers(): Call<List<UserResponse>> {
-        TODO("Not yet implemented")
-    }
 
-    override suspend fun getUsers(): ArrayList<UserResponse>? =
+    override suspend fun getUsers(): ArrayList<UserResponse> =
         try {
             client.get { url(Routes.GET_USERS) }
         } catch (e: RedirectResponseException) {

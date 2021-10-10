@@ -8,8 +8,9 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/Lucas/Documents/Projetos/Mobile-Test/app/src/main/res/drawable/ic_round_account_circle.xml" value="0.30564102564102563" />
         <entry key="..\:/Users/Lucas/Documents/Projetos/Mobile-Test/app/src/main/res/layout/activity_main.xml" value="0.291213768115942" />
-        <entry key="..\:/Users/Lucas/Documents/Projetos/Mobile-Test/app/src/main/res/layout/contacts_list_fragment.xml" value="0.2942708333333333" />
+        <entry key="..\:/Users/Lucas/Documents/Projetos/Mobile-Test/app/src/main/res/layout/contacts_list_fragment.xml" value="0.2879999900124293" />
         <entry key="..\:/Users/Lucas/Documents/Projetos/Mobile-Test/app/src/main/res/layout/list_item_user.xml" value="0.2821557971014493" />
       </map>
     </option>

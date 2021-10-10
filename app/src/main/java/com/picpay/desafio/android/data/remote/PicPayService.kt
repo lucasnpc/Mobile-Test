@@ -12,10 +12,10 @@ import retrofit2.http.GET
 
 interface PicPayService {
 
-    @GET("users")
-    fun callUsers(): Call<List<UserResponse>>
+//    @GET("users")
+//    fun callUsers(): Call<List<UserResponse>>
 
-    suspend fun getUsers(): ArrayList<UserResponse>?
+    suspend fun getUsers(): ArrayList<UserResponse>
 
     companion object {
         fun create(): PicPayService = PicPayServiceImpl(
