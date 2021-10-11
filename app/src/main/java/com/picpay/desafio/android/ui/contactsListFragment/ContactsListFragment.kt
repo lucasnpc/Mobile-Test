@@ -28,14 +28,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
 import coil.transform.CircleCropTransformation
 import com.picpay.desafio.android.R
 import com.picpay.desafio.android.data.remote.dto.UserResponse
 import dagger.hilt.android.AndroidEntryPoint
 
-@ExperimentalCoilApi
 @AndroidEntryPoint
 class ContactsListFragment : Fragment() {
 

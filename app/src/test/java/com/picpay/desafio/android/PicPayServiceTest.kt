@@ -1,9 +1,7 @@
 package com.picpay.desafio.android
 
-import androidx.lifecycle.MutableLiveData
 import com.picpay.desafio.android.data.PicPayRepository
 import com.picpay.desafio.android.data.remote.PicPayServiceImpl
-import com.picpay.desafio.android.ui.contactsListFragment.ContactsListState
 import io.ktor.client.*
 import io.ktor.client.engine.android.*
 import io.ktor.client.features.json.*

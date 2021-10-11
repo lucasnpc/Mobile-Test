@@ -4,7 +4,6 @@ import com.picpay.desafio.android.data.remote.dto.UserResponse
 import io.ktor.client.*
 import io.ktor.client.features.*
 import io.ktor.client.request.*
-import retrofit2.Call
 
 class PicPayServiceImpl(private val client: HttpClient) : PicPayService {
 
