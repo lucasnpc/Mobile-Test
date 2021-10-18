@@ -5,7 +5,7 @@ import com.picpay.desafio.android.data.remote.PicPayService
 import com.picpay.desafio.android.ui.contactsListFragment.ContactsListState
 import javax.inject.Inject
 
-class PicPayRepository @Inject constructor(private val service: PicPayService) {
+class PicPayRepository(private val service: PicPayService) {
 
     suspend fun getUsersRemote(state: MutableLiveData<ContactsListState>? = null) = service.getUsers().let {
         if (it.isEmpty())
